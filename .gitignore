@@ -1,0 +1,14 @@
+vs
+.vs
+.vscode
+build
+bin
+node_modules
+crash.log
+coverage
+coverage-report
+tmpdata
+data/dnn
+.idea/
+dist
+.DS_Store

@@ -1,0 +1,13 @@
+**
+!ci
+ci/coverage-report
+!package.json
+!binding.gyp
+!lib
+!test
+!cc
+!data/got.jpg
+!data/Lenna.png
+!data/people.jpeg
+!data/traffic.mp4
+!data/text-models
