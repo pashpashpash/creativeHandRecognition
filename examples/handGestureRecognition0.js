@@ -114,7 +114,7 @@ const red = new cv.Vec(0, 0, 255);
 const purple = new cv.Vec(255, 255, 255);
 
 // main
-const delay = 60;
+const delay = 2;
 grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
   const resizedImg = frame.resizeToMax(640);
 
@@ -137,28 +137,28 @@ grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
 
   const result = resizedImg.copy();
   // draw bounding box and center line
-  resizedImg.drawContours(
-    [handContour],
-    red,
-    { thickness: 2 }
-  );
+  // resizedImg.drawContours(
+  //   [handContour],
+  //   red,
+  //   { thickness: 2 }
+  // );
 
   // draw points and vertices
   verticesWithValidAngle.forEach((v) => {
-    resizedImg.drawLine(
-      v.pt,
-      v.d1,
-      { color: red, thickness: 2 }
-    );
-    resizedImg.drawLine(
-      v.pt,
-      v.d2,
-      { color: purple, thickness: 2 }
-    );
-    resizedImg.drawEllipse(
-      new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
-      { color: purple, thickness: 2 }
-    );
+    // resizedImg.drawLine(
+    //   v.pt,
+    //   v.d1,
+    //   { color: red, thickness: 2 }
+    // );
+    // resizedImg.drawLine(
+    //   v.pt,
+    //   v.d2,
+    //   { color: purple, thickness: 2 }
+    // );
+    // resizedImg.drawEllipse(
+    //   new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
+    //   { color: purple, thickness: 2 }
+    // );
     result.drawEllipse(
       new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
       { color: purple, thickness: 2 }
@@ -203,66 +203,110 @@ grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
         console.log("Finger 5 | x : "+finger5.x + "  y : " + finger5.y);
     }
     const { rows, cols } = result;
-    var tempMat = new cv.Mat (rows, cols, cv.CV_8UC3);
+    var overlay = new cv.Mat(rows, cols, cv.CV_8UC3);
+    var finalResult = result;
     if(finger1 != null && finger2 != null){
         console.log(fingerCount + " FINGERS PRESENT");
-        // result.drawRectangle(
-        //   finger1,
-        //   finger2,
-        //   { color: purple, thickness: 1}
-        // );
-        // result.drawLine(
-        //   finger1,
-        //   finger2,
-        //   { color: purple}
-        // );
-        var width = abs(finger1.x - finger2.x);
-        var height = abs(finger1.y - finger2.y);
-        tempMat = new cv.Mat (width, height, cv.CV_8UC3);
-        tempMat.drawLine(
-            new cv.Point(0, 0),
-            new cv.Point(70, 70),
-              { color: purple, thickness: 1}
-          );
-        result.putText(
+        overlay.drawRectangle(
+          finger1,
+          finger2,
+          { color: purple, thickness: 1}
+        );
+        result.drawLine(
+          finger1,
+          finger2,
+          { color: purple}
+        );
+        if(finger3!= null ){
+            result.drawLine(
+              finger1,
+              finger3,
+              { color: purple}
+            );
+            result.drawLine(
+              finger2,
+              finger3,
+              { color: purple}
+            );
+            if(finger4!=null) {
+                result.drawLine(
+                  finger3,
+                  finger4,
+                  { color: purple}
+                );
+                result.drawLine(
+                  finger2,
+                  finger4,
+                  { color: purple}
+                );
+                result.drawLine(
+                  finger1,
+                  finger4,
+                  { color: purple}
+                );
+                if(finger5!=null) {
+                    result.drawLine(
+                      finger4,
+                      finger5,
+                      { color: purple}
+                    );
+                    result.drawLine(
+                      finger3,
+                      finger5,
+                      { color: purple}
+                    );
+                    result.drawLine(
+                      finger2,
+                      finger5,
+                      { color: purple}
+                    );
+                    result.drawLine(
+                      finger1,
+                      finger5,
+                      { color: purple}
+                    );
+                }
+            }
+        }
+        var width = Math.abs(finger1.x - finger2.x);
+        var height = Math.abs(finger1.y - finger2.y);
+        overlay.putText(
           String("hello"),
           finger1,
           cv.FONT_ITALIC,
           2,
-          { color: purple, thickness: 2 }
+          { color: red, thickness: 2 }
         );
-        tempMat.drawRectangle(
-              finger1,
-              finger2,
-              { color: purple, thickness: 1}
-          );
+        // finalResult = result.bitwiseOr(overlay);
+        finalResult = result;
     }
-    console.log(fingerCount + " FINGERS PRESENT");
-
 
   // display detection result
-  const numFingersUp = verticesWithValidAngle.length;
-  result.drawRectangle(
-    new cv.Point(10, 10),
-    new cv.Point(70, 70),
-    { color: green, thickness: 2 }
-  );
-
-  const fontScale = 2;
-  result.putText(
-    String(numFingersUp),
-    new cv.Point(20, 60),
-    cv.FONT_ITALIC,
-    fontScale,
-    { color: green, thickness: 2 }
-  );
-
-
-  const sideBySide = new cv.Mat(rows, cols * 2, cv.CV_8UC3);
+  // const numFingersUp = verticesWithValidAngle.length;
+  // finalResult.drawRectangle(
+  //   new cv.Point(10, 10),
+  //   new cv.Point(70, 70),
+  //   { color: green, thickness: 2 }
+  // );
+  //
+  // const fontScale = 2;
+  // finalResult.putText(
+  //   String(numFingersUp),
+  //   new cv.Point(20, 60),
+  //   cv.FONT_ITALIC,
+  //   fontScale,
+  //   { color: green, thickness: 2 }
+  // );
 
 
-    tempMat.copyTo(result);
-  cv.imshow('result', result);
+  // const sideBySide = new cv.Mat(rows, cols * 2, cv.CV_8UC3);
+
+
+    // result = result + overlayMat;
+    // overlayMat.copyTo(result);
+    // result = result.add(overlay);
+    // var finalResult = result.absdiff(overlay);
+    cv.imshow('result', finalResult);
 
   // result.copyTo(sideBySide.getRegion(new cv.Rect(0, 0, cols, rows)));
   // resizedImg.copyTo(sideBySide.getRegion(new cv.Rect(cols, 0, cols, rows)));
