@@ -111,7 +111,7 @@ const filterVerticesByAngle = (vertices, maxAngleDeg) =>
 const blue = new cv.Vec(255, 0, 0);
 const green = new cv.Vec(0, 255, 0);
 const red = new cv.Vec(0, 0, 255);
-const purple = new cv.Vec(255, 255, 255);
+const white = new cv.Vec(255, 255, 255);
 
 // main
 const delay = 2;
@@ -153,15 +153,15 @@ grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
     // resizedImg.drawLine(
     //   v.pt,
     //   v.d2,
-    //   { color: purple, thickness: 2 }
+    //   { color: white, thickness: 2 }
     // );
     // resizedImg.drawEllipse(
     //   new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
-    //   { color: purple, thickness: 2 }
+    //   { color: white, thickness: 2 }
     // );
     result.drawEllipse(
       new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
-      { color: purple, thickness: 2 }
+      { color: white, thickness: 2 }
     );
   });
 
@@ -210,107 +210,75 @@ grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
         overlay.drawRectangle(
           finger1,
           finger2,
-          { color: purple, thickness: 1}
+          { color: white, thickness: 1}
         );
         result.drawLine(
           finger1,
           finger2,
-          { color: purple}
+          { color: white}
         );
         if(finger3!= null ){
             result.drawLine(
               finger1,
               finger3,
-              { color: purple}
+              { color: white}
             );
             result.drawLine(
               finger2,
               finger3,
-              { color: purple}
+              { color: white}
             );
             if(finger4!=null) {
                 result.drawLine(
                   finger3,
                   finger4,
-                  { color: purple}
+                  { color: white}
                 );
                 result.drawLine(
                   finger2,
                   finger4,
-                  { color: purple}
+                  { color: white}
                 );
                 result.drawLine(
                   finger1,
                   finger4,
-                  { color: purple}
+                  { color: white}
                 );
                 if(finger5!=null) {
                     result.drawLine(
                       finger4,
                       finger5,
-                      { color: purple}
+                      { color: white}
                     );
                     result.drawLine(
                       finger3,
                       finger5,
-                      { color: purple}
+                      { color: white}
                     );
                     result.drawLine(
                       finger2,
                       finger5,
-                      { color: purple}
+                      { color: white}
                     );
                     result.drawLine(
                       finger1,
                       finger5,
-                      { color: purple}
+                      { color: white}
                     );
                 }
             }
         }
         var width = Math.abs(finger1.x - finger2.x);
         var height = Math.abs(finger1.y - finger2.y);
-        overlay.putText(
+        result.putText(
           String("hello"),
           finger1,
           cv.FONT_ITALIC,
           2,
           { color: red, thickness: 2 }
         );
-        // finalResult = result.bitwiseOr(overlay);
-        finalResult = result;
+        result.add(overlay);
+        console.log(result.dims);
     }
-
-  // display detection result
-  // const numFingersUp = verticesWithValidAngle.length;
-  // finalResult.drawRectangle(
-  //   new cv.Point(10, 10),
-  //   new cv.Point(70, 70),
-  //   { color: green, thickness: 2 }
-  // );
-  //
-  // const fontScale = 2;
-  // finalResult.putText(
-  //   String(numFingersUp),
-  //   new cv.Point(20, 60),
-  //   cv.FONT_ITALIC,
-  //   fontScale,
-  //   { color: green, thickness: 2 }
-  // );
-
-
-  // const sideBySide = new cv.Mat(rows, cols * 2, cv.CV_8UC3);
-
-
-    // result = result + overlayMat;
-    // overlayMat.copyTo(result);
-    // result = result.add(overlay);
-    // var finalResult = result.absdiff(overlay);
-    cv.imshow('result', finalResult);
-
-  // result.copyTo(sideBySide.getRegion(new cv.Rect(0, 0, cols, rows)));
-  // resizedImg.copyTo(sideBySide.getRegion(new cv.Rect(cols, 0, cols, rows)));
-
-  // cv.imshow('handMask', handMask);
-  // cv.imshow('result', sideBySide);
+    cv.imshow('result', result);
 });
