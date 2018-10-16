@@ -112,10 +112,11 @@ const blue = new cv.Vec(255, 0, 0);
 const green = new cv.Vec(0, 255, 0);
 const red = new cv.Vec(0, 0, 255);
 const white = new cv.Vec(255, 255, 255);
+const purple= new cv.Vec(96, 76, 141);
 
 // main
 const delay = 2;
-grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
+grabFrames('../data/IMG_2286.mp4', delay, (frame) => { //for each frame
   const resizedImg = frame.resizeToMax(640);
 
   const handMask = makeHandMask(resizedImg);
@@ -135,35 +136,18 @@ grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
   const maxAngleDeg = 60;
   const verticesWithValidAngle = filterVerticesByAngle(vertices, maxAngleDeg);
 
-  const result = resizedImg.copy();
+  let result = resizedImg.copy();
+  // drawWhiteLines(result);
   // draw bounding box and center line
-  // resizedImg.drawContours(
-  //   [handContour],
-  //   red,
-  //   { thickness: 2 }
-  // );
+
 
   // draw points and vertices
-  verticesWithValidAngle.forEach((v) => {
-    // resizedImg.drawLine(
-    //   v.pt,
-    //   v.d1,
-    //   { color: red, thickness: 2 }
-    // );
-    // resizedImg.drawLine(
-    //   v.pt,
-    //   v.d2,
-    //   { color: white, thickness: 2 }
-    // );
-    // resizedImg.drawEllipse(
-    //   new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
-    //   { color: white, thickness: 2 }
-    // );
-    result.drawEllipse(
-      new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
-      { color: white, thickness: 2 }
-    );
-  });
+  // verticesWithValidAngle.forEach((v) => {
+  //   result.drawEllipse(
+  //     new cv.RotatedRect(v.pt, new cv.Size(1, 1), 0),
+  //     { color: white, thickness: 1 }
+  //   );
+  // });
 
     //_________________________________________________________________________________//
     // draw lines between the CIRCLES verticesWithValidAngle[0]-[4] are the 5 fingers
@@ -203,15 +187,151 @@ grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
         console.log("Finger 5 | x : "+finger5.x + "  y : " + finger5.y);
     }
     const { rows, cols } = result;
-    var overlay = new cv.Mat(rows, cols, cv.CV_8UC3);
     var finalResult = result;
+
+    // if(finger1 != null && finger2 != null){
+    //     console.log(fingerCount + " FINGERS PRESENT");
+    //     // overlay.drawRectangle(
+    //     //   finger1,
+    //     //   finger2,
+    //     //   { color: purple, thickness: 1}
+    //     // );
+    //     overlay.drawLine(
+    //       finger1,
+    //       finger2,
+    //       { color: purple}
+    //     );
+    //     if(finger3!= null ){
+    //         overlay.drawLine(
+    //           finger1,
+    //           finger3,
+    //           { color: purple}
+    //         );
+    //         overlay.drawLine(
+    //           finger2,
+    //           finger3,
+    //           { color: purple}
+    //         );
+    //         if(finger4!=null) {
+    //             overlay.drawLine(
+    //               finger3,
+    //               finger4,
+    //               { color: purple}
+    //             );
+    //             overlay.drawLine(
+    //               finger2,
+    //               finger4,
+    //               { color: purple}
+    //             );
+    //             overlay.drawLine(
+    //               finger1,
+    //               finger4,
+    //               { color: purple}
+    //             );
+    //             if(finger5!=null) {
+    //                 overlay.drawLine(
+    //                   finger4,
+    //                   finger5,
+    //                   { color: purple}
+    //                 );
+    //                 overlay.drawLine(
+    //                   finger3,
+    //                   finger5,
+    //                   { color: purple}
+    //                 );
+    //                 overlay.drawLine(
+    //                   finger2,
+    //                   finger5,
+    //                   { color: purple}
+    //                 );
+    //                 overlay.drawLine(
+    //                   finger1,
+    //                   finger5,
+    //                   { color: purple}
+    //                 );
+    //             }
+    //         }
+    //     }
+    //     var width = Math.abs(finger1.x - finger2.x);
+    //     var height = Math.abs(finger1.y - finger2.y);
+    //     // overlay.putText(
+    //     //   String("hello"),
+    //     //   finger1,
+    //     //   cv.FONT_ITALIC,
+    //     //   2,
+    //     //   { color: red, thickness: 2 }
+    //     // );
+    //     // overlay.convertGrayscale();
+    //     // overlay.gaussianBlur([3, 3]);
+    //     let ksize = new cv.Size(3, 10);
+    //     let overlaytemp = overlay;
+    //     overlay = overlay.blur(ksize);
+    //     overlay = overlay.add(overlaytemp);
+    //     // result.add(overlay);
+    //     let anchor = new cv.Point(-1, -1);
+    //     let dst = new cv.Mat();
+    //     // result.bilateralFilter(1, 200, 200, cv.BORDER_DEFAULT);
+    //     result = result.addWeighted( 1,overlay,  2, 4);
+    //     // result.add(overlay);
+    //
+    //
+    //
+    //     // console.log(result.dims);
+    // }
+
+
+    let overlay = new cv.Mat(rows, cols, cv.CV_8UC3);
+    // drawWhiteLines(result, fingerCount, finger1, finger2, finger3, finger4, finger5);
+    result = drawPurpleLines(result, overlay, fingerCount, finger1, finger2, finger3, finger4, finger5);
+    // result = drawPurpleLines_Negative(result, overlay, fingerCount, finger1, finger2, finger3, finger4, finger5);
+    // drawHandContour(result, handContour);
+    // result = drawBlurredHandContour(result, overlay, handContour);
+
+    if(result != null) {
+        cv.imshow('result', result);
+    }
+    // cv.imshow('art project', result);
+});
+function drawHandContour(result, handContour) {
+    if(result!=null) {
+        result.drawContours(
+          [handContour],
+          white,
+          { thickness: 1 },
+        );
+    }
+
+}
+function drawBlurredHandContour(result, overlay, handContour) {
+    overlay.drawContours(
+      [handContour],
+      white,
+      { thickness: 1 },
+    );
+    let ksize = new cv.Size(3, 10);
+    let overlaytemp = overlay;
+    overlay = overlay.blur(ksize);
+    overlay = overlay.add(overlaytemp);
+
+    if(result != null) {
+        result = result.addWeighted( 1,overlay,  2, 4);
+        if(result.at(0) !=null) {
+            if(result.at(0).at(0) > 250) { //skip frame if its all white
+                result = null;
+            } else if (result.at(1).at(1) > 250) {
+                result = null;
+            } else {
+                return result;
+            }
+        }
+    }
+    return  result;
+}
+
+
+function drawWhiteLines(result, fingerCount, finger1, finger2, finger3, finger4, finger5) {
     if(finger1 != null && finger2 != null){
         console.log(fingerCount + " FINGERS PRESENT");
-        overlay.drawRectangle(
-          finger1,
-          finger2,
-          { color: white, thickness: 1}
-        );
         result.drawLine(
           finger1,
           finger2,
@@ -268,17 +388,179 @@ grabFrames('../data/hand-gesture.mp4', delay, (frame) => { //for each frame
                 }
             }
         }
-        var width = Math.abs(finger1.x - finger2.x);
-        var height = Math.abs(finger1.y - finger2.y);
-        result.putText(
-          String("hello"),
-          finger1,
-          cv.FONT_ITALIC,
-          2,
-          { color: red, thickness: 2 }
-        );
-        result.add(overlay);
-        console.log(result.dims);
     }
-    cv.imshow('result', result);
-});
+}
+
+function drawPurpleLines(result, overlay, fingerCount, finger1, finger2, finger3, finger4, finger5) {
+    // var overlay = new cv.Mat(rows, cols, cv.CV_8UC3);
+    if(finger1 != null && finger2 != null){
+        console.log(fingerCount + " FINGERS PRESENT");
+        overlay.drawLine(
+          finger1,
+          finger2,
+          { color: purple}
+        );
+        if(finger3!= null ){
+            overlay.drawLine(
+              finger1,
+              finger3,
+              { color: purple}
+            );
+            overlay.drawLine(
+              finger2,
+              finger3,
+              { color: purple}
+            );
+            if(finger4!=null) {
+                overlay.drawLine(
+                  finger3,
+                  finger4,
+                  { color: purple}
+                );
+                overlay.drawLine(
+                  finger2,
+                  finger4,
+                  { color: purple}
+                );
+                overlay.drawLine(
+                  finger1,
+                  finger4,
+                  { color: purple}
+                );
+                if(finger5!=null) {
+                    overlay.drawLine(
+                      finger4,
+                      finger5,
+                      { color: purple}
+                    );
+                    overlay.drawLine(
+                      finger3,
+                      finger5,
+                      { color: purple}
+                    );
+                    overlay.drawLine(
+                      finger2,
+                      finger5,
+                      { color: purple}
+                    );
+                    overlay.drawLine(
+                      finger1,
+                      finger5,
+                      { color: purple}
+                    );
+                }
+            }
+        }
+        // overlay.putText(
+        //   String("swag"),
+        //   finger1,
+        //   cv.FONT_ITALIC,
+        //   2,
+        //   { color: white, thickness: 2 }
+        // );
+        let ksize = new cv.Size(3, 10);
+        let overlaytemp = overlay;
+        overlay = overlay.blur(ksize);
+        overlay = overlay.add(overlaytemp);
+        if(result != null) {
+            result = result.addWeighted( 1,overlay,  2, 4);
+            if(result.at(0) !=null) {
+                if(result.at(0).at(0) > 250) { //skip frame if its all white
+                    result = null;
+                } else if (result.at(1).at(1) > 250) {
+                    result = null;
+                } else {
+                    return result;
+                }
+            }
+        }
+        return (result);
+    }
+}
+
+function drawPurpleLines_Negative(result, overlay, fingerCount, finger1, finger2, finger3, finger4, finger5) {
+    // var overlay = new cv.Mat(rows, cols, cv.CV_8UC3);
+    if(finger1 != null && finger2 != null){
+        console.log(fingerCount + " FINGERS PRESENT");
+        overlay.drawLine(
+          finger1,
+          finger2,
+          { color: purple}
+        );
+        if(finger3!= null ){
+            overlay.drawLine(
+              finger1,
+              finger3,
+              { color: purple}
+            );
+            overlay.drawLine(
+              finger2,
+              finger3,
+              { color: purple}
+            );
+            if(finger4!=null) {
+                overlay.drawLine(
+                  finger3,
+                  finger4,
+                  { color: purple}
+                );
+                overlay.drawLine(
+                  finger2,
+                  finger4,
+                  { color: purple}
+                );
+                overlay.drawLine(
+                  finger1,
+                  finger4,
+                  { color: purple}
+                );
+                if(finger5!=null) {
+                    overlay.drawLine(
+                      finger4,
+                      finger5,
+                      { color: purple}
+                    );
+                    overlay.drawLine(
+                      finger3,
+                      finger5,
+                      { color: purple}
+                    );
+                    overlay.drawLine(
+                      finger2,
+                      finger5,
+                      { color: purple}
+                    );
+                    overlay.drawLine(
+                      finger1,
+                      finger5,
+                      { color: purple}
+                    );
+                }
+            }
+        }
+        // overlay.putText(
+        //   String("swag"),
+        //   finger1,
+        //   cv.FONT_ITALIC,
+        //   2,
+        //   { color: white, thickness: 2 }
+        // );
+        let ksize = new cv.Size(3, 10);
+        let overlaytemp = overlay;
+        overlay = overlay.blur(ksize);
+        overlay = overlay.add(overlaytemp);
+        if(result != null) {
+            result = result.addWeighted( -1,overlay,  2, 4);
+            if(result.at(0) !=null) {
+                if(result.at(0).at(0) > 250) { //skip frame if its all white
+                    result = null;
+                } else if (result.at(1).at(1) > 250) {
+                    result = null;
+                } else {
+                    return result;
+                }
+            }
+        }
+        return (result);
+    }
+}
