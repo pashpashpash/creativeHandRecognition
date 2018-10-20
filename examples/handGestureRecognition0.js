@@ -116,10 +116,11 @@ const purple= new cv.Vec(96, 76, 141);
 
 const defaultVideo = "../data/hand-gesture.mp4";
 const myVideo = "../data/IMG_2286.mp4";
+const myVideo2 = "../data/IMG_2310.mp4";
 
 // main
 const delay = 1;
-grabFrames(defaultVideo, delay, (frame) => { //for each frame
+grabFrames(myVideo2, delay, (frame) => { //for each frame
     const resizedImg = frame.resizeToMax(640);
 
     const handMask = makeHandMask(resizedImg);
