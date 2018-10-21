@@ -118,9 +118,10 @@ const defaultVideo = "../data/hand-gesture.mp4";
 const myVideo = "../data/IMG_2286.mp4";
 const myVideo2 = "../data/IMG_2310.mp4";
 
+
 // main
 const delay = 1;
-grabFrames(myVideo2, delay, (frame) => { //for each frame
+grabFrames(myVideo, delay, (frame) => { //for each frame
     const resizedImg = frame.resizeToMax(640);
 
     const handMask = makeHandMask(resizedImg);
@@ -367,7 +368,7 @@ function drawPurpleLines(result, overlay, fingerCount, verticesWithValidAngle) {
 
 
 
-    let ksize = new cv.Size(10 , 10);
+    let ksize = new cv.Size(10+random , 10);
     let overlaytemp = overlay;
 
 
