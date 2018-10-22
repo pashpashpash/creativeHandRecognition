@@ -117,11 +117,12 @@ const purple= new cv.Vec(96, 76, 141);
 const defaultVideo = "../data/hand-gesture.mp4";
 const myVideo = "../data/IMG_2286.mp4";
 const myVideo2 = "../data/IMG_2310.mp4";
+const myVideo3 = "../data/IMG_2310_cut.mp4";
 
 
 // main
-const delay = 1;
-grabFrames(myVideo, delay, (frame) => { //for each frame
+const delay = 2;
+grabFrames(defaultVideo, delay, (frame) => { //for each frame
     const resizedImg = frame.resizeToMax(640);
 
     const handMask = makeHandMask(resizedImg);
@@ -195,9 +196,9 @@ grabFrames(myVideo, delay, (frame) => { //for each frame
     //set a blank overlay for use in multi-layer animation functions
     let overlay = new cv.Mat(rows, cols, cv.CV_8UC3);
 
-    // drawWhiteLines(result, fingerCount, finger1, finger2, finger3, finger4, finger5);
-    result = drawPurpleLines(result, overlay, fingerCount, verticesWithValidAngle);
-    // result = drawPurpleLines_Negative(result, overlay, fingerCount, finger1, finger2, finger3, finger4, finger5);
+    drawWhiteLines(result, fingerCount, finger1, finger2, finger3, finger4, finger5);
+    // result = drawPurpleLines(result, overlay, fingerCount, verticesWithValidAngle);
+    // result = drawPurpleLines_Negative(result, overlay, fingerCount, verticesWithValidAngle);
     // drawHandContour(result, handContour);
     // result = drawBlurredHandContour(result, overlay, handContour);
 
@@ -315,7 +316,7 @@ function drawWord(result, overlay, fingerCount, finger1, finger2, finger3, finge
         let overlaytemp = overlay;
         console.log(finger1.x);
         overlay.putText(
-          String("swag"),
+          String("test"),
           finger1,
           cv.FONT_ITALIC,
           2,
@@ -395,32 +396,52 @@ function drawPurpleLines(result, overlay, fingerCount, verticesWithValidAngle) {
     return result;
 
 }
+function drawPurpleLines_Negative(result, overlay, fingerCount, verticesWithValidAngle) {
+    let random = Math.floor(Math.random() * 10); //random int from 0-9
+    let random2 = Math.floor(Math.random() * 100); //random int from 0-9
+    let purple2= new cv.Vec(96+random2, 76+random2, 141+random2);
 
-function drawPurpleLines_Negative(result, overlay, fingerCount, finger1, finger2, finger3, finger4, finger5) {
-    // var overlay = new cv.Mat(rows, cols, cv.CV_8UC3);
-        // overlay.putText(
-        //   String("swag"),
-        //   finger1,
-        //   cv.FONT_ITALIC,
-        //   2,
-        //   { color: white, thickness: 2 }
-        // );
-        let ksize = new cv.Size(3, 10);
-        let overlaytemp = overlay;
-        overlay = overlay.blur(ksize);
-        overlay = overlay.add(overlaytemp);
-        if(result != null) {
-            result = result.addWeighted( -1,overlay,  2, 4);
-            if(result.at(0) !=null) {
-                if(result.at(0).at(0) > 250) { //skip frame if its all white
-                    result = null;
-                } else if (result.at(1).at(1) > 250) {
-                    result = null;
-                } else {
-                    return result;
-                }
+    verticesWithValidAngle.forEach((v, i) => {
+        let fingerPoint = v.pt;
+        let index = i;
+        for (var s = index+1; s < verticesWithValidAngle.length; s++) {
+            fingerPoint2 = verticesWithValidAngle[s].pt;
+            if(!(fingerPoint.y> result.rows/2*1.2) && !(fingerPoint2.y>result.rows/2*1.2)) {
+                overlay.drawLine(
+                  fingerPoint,
+                  fingerPoint2,
+                  { color: purple2}
+                );
             }
         }
-        return (result);
+    });
+
+
+
+    let ksize = new cv.Size(10+random , 10);
+    let overlaytemp = overlay;
+
+
+    overlay = overlay.blur(ksize);
+    overlay = overlay.add(overlaytemp);
+    // console.log(overlay.at(0).at(0));
+
+    // overlay = overlay.add(overlay);
+
+
+    if(result != null) {
+
+        result = result.addWeighted( -1,overlay,  4+random, 1);
+        if(result.at(0) !=null) {
+            if(result.at(0).at(0) > 250) { //skip frame if its all white
+                result = null;
+            } else if (result.at(1).at(1) > 250) {
+                result = null;
+            } else {
+                return result;
+            }
+        }
+    }
+    return result;
 
 }
